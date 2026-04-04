@@ -1,0 +1,59 @@
+{# Categories Table with infinite scroll #}
+<div class="data-table-container">
+    <table class="data-table">
+        <caption class="sr-only">Categories Table</caption>
+        <thead>
+            <tr>
+                <th class="cell-narrow">ID</th>
+                <th class="cell-narrow">{{ _("Icon") }}</th>
+                <th class="sortable"
+                    hx-get="{{ request.url.path }}"
+                    hx-target="#categories-table-container"
+                    hx-include="[name='search'],[name='per_page']"
+                    hx-vals='{"order_by": "{% if order_by == "name" %}-name{% elif order_by == "-name" %}name{% else %}-name{% endif %}"}'
+                    hx-push-url="true">
+                    {{ _("Name") }}
+                    {% if order_by == "name" %}
+                    {{ icon('chevron-up-outline', class='sort-icon') }}
+                    {% elif order_by == "-name" %}
+                    {{ icon('chevron-down-outline', class='sort-icon') }}
+                    {% endif %}
+                </th>
+                <th class="hide-mobile">{{ _("Description") }}</th>
+                <th class="cell-center cell-narrow">{{ _("Products") }}</th>
+                <th class="sortable cell-center cell-narrow"
+                    hx-get="{{ request.url.path }}"
+                    hx-target="#categories-table-container"
+                    hx-include="[name='search'],[name='per_page']"
+                    hx-vals='{"order_by": "{% if order_by == "order" %}-order{% elif order_by == "-order" %}order{% else %}order{% endif %}"}'
+                    hx-push-url="true">
+                    {{ _("Order") }}
+                    {% if order_by == "order" %}
+                    {{ icon('chevron-up-outline', class='sort-icon') }}
+                    {% elif order_by == "-order" %}
+                    {{ icon('chevron-down-outline', class='sort-icon') }}
+                    {% endif %}
+                </th>
+                <th class="cell-actions">{{ _("Actions") }}</th>
+            </tr>
+        </thead>
+        {% include "inventory/partials/categories_table_rows.html" %}
+    </table>
+
+    {% if has_next %}
+    <div class="infinite-scroll-loader"
+         hx-get="{{ request.url.path }}?page={{ next_page }}{% if search %}&search={{ search }}{% endif %}{% if order_by %}&order_by={{ order_by }}{% endif %}&per_page={{ per_page }}"
+         hx-trigger="revealed"
+         hx-target="#categories-tbody"
+         hx-swap="beforeend"
+         hx-select="#categories-tbody > tr, .infinite-scroll-loader, .infinite-scroll-end">
+        <ion-spinner name="crescent"></ion-spinner>
+    </div>
+    {% else %}
+    {% if total_count > 0 %}
+    <div class="infinite-scroll-end">
+        {{ ngettext("%(count)d category", "%(count)d categories", total_count) % {"count": total_count} }}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>

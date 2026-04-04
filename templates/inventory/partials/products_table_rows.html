@@ -1,0 +1,74 @@
+<tbody id="products-tbody">
+    {% for product in products %}
+    <tr>
+        {# ID #}
+        <td class="mono text-secondary">{{ product.id }}</td>
+
+        {# Image #}
+        <td>
+            {% if product.image %}
+            <img src="{{ product.image }}" alt="{{ product.name }}" class="table-image">
+            {% else %}
+            <div class="table-image-placeholder">
+                {{ icon('cube-outline') }}
+            </div>
+            {% endif %}
+        </td>
+
+        {# Name #}
+        <td>{{ product.name }}</td>
+
+        {# SKU #}
+        <td class="hide-mobile">{{ product.sku }}</td>
+
+        {# Price #}
+        <td class="numeric">${{ "%.2f"|format(product.price) }}</td>
+
+        {# Stock #}
+        <td>
+            {% if product.is_low_stock %}
+            <span class="table-stock-badge table-stock-badge--low">{{ product.stock }}</span>
+            {% else %}
+            {{ product.stock }}
+            {% endif %}
+        </td>
+
+        {# Actions #}
+        <td>
+            <div class="table-actions">
+                <ion-button size="small" fill="clear" href="/m/inventory/products/{{ product.id }}" title="{{ _('View') }}">
+                    {{ icon('eye-outline') }}
+                </ion-button>
+                <ion-button size="small" fill="clear" href="/m/inventory/products/{{ product.id }}/edit" title="{{ _('Edit') }}">
+                    {{ icon('create-outline') }}
+                </ion-button>
+                {% if barcode_enabled %}
+                <ion-button size="small" fill="clear" id="barcode-btn-{{ product.id }}" title="{{ _('Print Barcode') }}">
+                    {{ icon('barcode-outline') }}
+                </ion-button>
+                {% endif %}
+                <ion-button size="small" fill="clear" color="danger"
+                            onclick="confirmDeleteProduct('{{ product.id }}', '{{ product.name }}', this)"
+                            title="{{ _('Delete') }}">
+                    {{ icon('trash-outline') }}
+                </ion-button>
+            </div>
+        </td>
+    </tr>
+
+    {# Barcode Modal #}
+    {% if barcode_enabled %}
+    {% include "inventory/partials/barcode_modal.html" %}
+    {% endif %}
+
+    {% else %}
+    <tr>
+        <td colspan="7">
+            <div class="table-empty">
+                {{ icon('folder-open-outline', class='table-empty-icon') }}
+                <p>{{ _("No products found") }}</p>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>

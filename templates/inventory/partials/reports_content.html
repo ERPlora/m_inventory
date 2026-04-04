@@ -1,0 +1,230 @@
+{% extends "ui/module_content.html" %}
+
+{% block content %}
+{# Primary Stats Row #}
+<div class="ui-grid ui-grid--stats mb-lg">
+    {{ stat_card(value=total_products, label=_("Total Products"), icon="cube-outline", color="primary") }}
+    {{ stat_card(value=products_in_stock, label=_("In Stock"), icon="checkmark-circle-outline", color="success") }}
+    {{ stat_card(value=products_low_stock, label=_("Low Stock"), icon="alert-circle-outline", color="warning") }}
+    <ion-card class="ui-stat-card m-0">
+        <ion-card-content class="p-md">
+            <div class="d-flex align-center gap-sm">
+                <div class="ui-stat-icon ui-stat-icon--success">
+                    {{ icon('cash-outline') }}
+                </div>
+                <div>
+                    <div class="fs-xs text-secondary">{{ _("Total Value") }}</div>
+                    <div class="ui-stat-value text-success">${{ "%.2f"|format(total_inventory_value) }}</div>
+                </div>
+            </div>
+        </ion-card-content>
+    </ion-card>
+</div>
+
+{# Secondary Stats Row #}
+<div class="ui-grid ui-grid--stats mb-lg">
+    {{ stat_card(value=products_out_of_stock, label=_("Out of Stock"), icon="close-circle-outline", color="danger") }}
+    {{ stat_card(value=total_categories, label=_("Categories"), icon="albums-outline", color="primary") }}
+    {{ stat_card(value=total_units, label=_("Total Units"), icon="layers-outline", color="success") }}
+    <ion-card class="ui-stat-card m-0">
+        <ion-card-content class="p-md">
+            <div class="d-flex align-center gap-sm">
+                <div class="ui-stat-icon ui-stat-icon--warning">
+                    {{ icon('trending-down-outline') }}
+                </div>
+                <div>
+                    <div class="fs-xs text-secondary">{{ _("Cost Value") }}</div>
+                    <div class="ui-stat-value text-warning">${{ "%.2f"|format(total_cost_value) }}</div>
+                </div>
+            </div>
+        </ion-card-content>
+    </ion-card>
+</div>
+
+{# Stock by Category #}
+<ion-card class="mb-lg">
+    <ion-card-content>
+        <div class="mb-md">
+            <span class="fw-semibold fs-lg">{{ _("Stock by Category") }}</span>
+        </div>
+
+        {% if category_stats %}
+        <div class="data-table-container">
+            <table class="data-table">
+                <caption class="sr-only">Reports</caption>
+                <thead>
+                    <tr>
+                        <th>{{ _("Category") }}</th>
+                        <th class="cell-center">{{ _("Products") }}</th>
+                        <th class="cell-center">{{ _("Units") }}</th>
+                        <th class="cell-right">{{ _("Value") }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in category_stats %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-center gap-sm">
+                                <div class="table-image-placeholder" style="width: 32px; height: 32px; background: {{ stat.color }}20; border-color: {{ stat.color }};">
+                                    {{ icon(stat.icon, size=16, class='text-' + stat.color) }}
+                                </div>
+                                <span>{{ stat.name }}</span>
+                            </div>
+                        </td>
+                        <td class="cell-center">{{ stat.product_count }}</td>
+                        <td class="cell-center">{{ stat.total_stock }}</td>
+                        <td class="cell-right fw-semibold text-success">${{ "%.2f"|format(stat.total_value) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="table-empty">
+            {{ icon('albums-outline', class='table-empty-icon') }}
+            <p>{{ _("No categories with products") }}</p>
+        </div>
+        {% endif %}
+    </ion-card-content>
+</ion-card>
+
+{# Top Products Cards #}
+<div class="ui-grid ui-grid--2 mb-lg">
+    {# Top Products by Value #}
+    <ion-card>
+        <ion-card-content>
+            <div class="mb-md">
+                <span class="fw-semibold fs-lg">{{ _("Top Products by Stock Value") }}</span>
+            </div>
+
+            {% if top_products_by_value %}
+            <div class="d-flex flex-column gap-sm">
+                {% for product in top_products_by_value %}
+                <div class="d-flex align-center justify-between p-sm rounded-lg" style="background: var(--bg-color-secondary);">
+                    <div class="d-flex align-center gap-sm">
+                        {% if product.image %}
+                        <img src="{{ product.image }}" alt="{{ product.name }}" class="table-image" style="width: 40px; height: 40px;">
+                        {% else %}
+                        <div class="table-image-placeholder" style="width: 40px; height: 40px;">
+                            {{ icon('cube-outline') }}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <div class="fw-medium">{{ product.name }}</div>
+                            <div class="fs-xs text-secondary">
+                                {{ product.stock }} {{ _("units") }} &times; ${{ "%.2f"|format(product.price) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="fw-semibold text-success">${{ "%.2f"|format(product.stock_value) }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="table-empty">
+                <p>{{ _("No products in stock") }}</p>
+            </div>
+            {% endif %}
+        </ion-card-content>
+    </ion-card>
+
+    {# Top Products by Stock Quantity #}
+    <ion-card>
+        <ion-card-content>
+            <div class="mb-md">
+                <span class="fw-semibold fs-lg">{{ _("Top Products by Stock Quantity") }}</span>
+            </div>
+
+            {% if top_products_by_stock %}
+            <div class="d-flex flex-column gap-sm">
+                {% for product in top_products_by_stock %}
+                <div class="d-flex align-center justify-between p-sm rounded-lg" style="background: var(--bg-color-secondary);">
+                    <div class="d-flex align-center gap-sm">
+                        {% if product.image %}
+                        <img src="{{ product.image }}" alt="{{ product.name }}" class="table-image" style="width: 40px; height: 40px;">
+                        {% else %}
+                        <div class="table-image-placeholder" style="width: 40px; height: 40px;">
+                            {{ icon('cube-outline') }}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <div class="fw-medium">{{ product.name }}</div>
+                            <div class="fs-xs text-secondary">
+                                ${{ "%.2f"|format(product.price) }} {{ _("each") }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="fw-semibold text-primary">{{ product.stock }} {{ _("units") }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="table-empty">
+                <p>{{ _("No products in stock") }}</p>
+            </div>
+            {% endif %}
+        </ion-card-content>
+    </ion-card>
+</div>
+
+{# Critical Stock Alert #}
+{% if critical_stock_products %}
+<ion-card>
+    <ion-card-content>
+        <div class="d-flex align-center gap-sm mb-md">
+            {{ icon('warning-outline', size=24, class='text-error') }}
+            <span class="fw-semibold fs-lg">{{ _("Critical Stock Products") }}</span>
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <caption class="sr-only">Critical Stock</caption>
+                <thead>
+                    <tr>
+                        <th>{{ _("Product") }}</th>
+                        <th>{{ _("SKU") }}</th>
+                        <th class="cell-center">{{ _("Current Stock") }}</th>
+                        <th class="cell-center">{{ _("Threshold") }}</th>
+                        <th class="cell-actions">{{ _("Actions") }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in critical_stock_products %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-center gap-sm">
+                                {% if product.image %}
+                                <img src="{{ product.image }}" alt="{{ product.name }}" class="table-image" style="width: 40px; height: 40px;">
+                                {% else %}
+                                <div class="table-image-placeholder" style="width: 40px; height: 40px;">
+                                    {{ icon('cube-outline') }}
+                                </div>
+                                {% endif %}
+                                <span>{{ product.name }}</span>
+                            </div>
+                        </td>
+                        <td class="mono text-secondary">{{ product.sku }}</td>
+                        <td class="cell-center">
+                            <span class="table-stock-badge table-stock-badge--out">{{ product.stock }}</span>
+                        </td>
+                        <td class="cell-center text-secondary">{{ product.low_stock_threshold }}</td>
+                        <td>
+                            <div class="table-actions">
+                                <ion-button size="small" fill="clear" href="/m/inventory/products/{{ product.id }}/edit">
+                                    {{ icon('create-outline') }}
+                                </ion-button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </ion-card-content>
+</ion-card>
+{% endif %}
+{% endblock %}

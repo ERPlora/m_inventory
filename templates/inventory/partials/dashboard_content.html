@@ -1,0 +1,86 @@
+{% extends "ui/module_content.html" %}
+
+{% block content %}
+{# Stats Cards Grid #}
+<div class="ui-grid ui-grid--stats mb-lg">
+    {{ stat_card(value=total_products, label=_("Total Products"), icon="cube-outline", color="primary") }}
+    {{ stat_card(value=products_in_stock, label=_("In Stock"), icon="checkmark-circle-outline", color="success") }}
+    {{ stat_card(value=products_low_stock, label=_("Low Stock"), icon="alert-circle-outline", color="warning") }}
+    {{ stat_card(value="%.2f"|format(total_inventory_value), label=_("Total Value"), icon="cash-outline", color="success") }}
+</div>
+
+{# Categories Summary #}
+<ion-card class="mb-lg">
+    <ion-card-content>
+        <div class="d-flex justify-between align-center mb-md">
+            <span class="fw-semibold fs-lg">{{ _("Categories") }}</span>
+            <ion-button fill="clear" size="small"
+                        hx-get="{{ url_for('inventory.categories_index') }}"
+                        hx-target="#main-content-area" hx-push-url="true">
+                {{ _("View all") }}
+                {{ icon('arrow-forward-outline') }}
+            </ion-button>
+        </div>
+        {% if categories %}
+        <div class="category-list">
+            {% for category in categories %}
+            <div class="category-item">
+                <div class="category-item-info">
+                    <div class="category-item-icon" style="background: {{ category.color }}20;">
+                        {{ icon(category.icon, class='text-' + category.color) }}
+                    </div>
+                    <div>
+                        <div class="category-item-name">{{ category.name }}</div>
+                        <div class="category-item-count">{{ category.product_count }} {{ _("products") }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="table-empty">
+            {{ icon('albums-outline', class='table-empty-icon') }}
+            <p>{{ _("No categories created") }}</p>
+        </div>
+        {% endif %}
+    </ion-card-content>
+</ion-card>
+
+{# Low Stock Products #}
+{% if low_stock_products %}
+<ion-card class="mb-lg">
+    <ion-card-content>
+        <div class="d-flex justify-between align-center mb-md">
+            <div class="d-flex align-center gap-sm">
+                {{ icon('alert-circle-outline', class='text-warning') }}
+                <span class="fw-semibold">{{ _("Low Stock Products") }}</span>
+            </div>
+            <ion-button fill="clear" size="small"
+                        hx-get="{{ url_for('inventory.products_list') }}"
+                        hx-target="#main-content-area" hx-push-url="true">
+                {{ _("View all") }}
+                {{ icon('arrow-forward-outline') }}
+            </ion-button>
+        </div>
+        <ion-list lines="full">
+            {% for product in low_stock_products %}
+            <ion-item class="low-stock-item">
+                <div slot="start" class="low-stock-item-image">
+                    {% if product.image %}
+                    <img src="{{ product.image }}" alt="{{ product.name }}">
+                    {% else %}
+                    {{ icon('cube-outline') }}
+                    {% endif %}
+                </div>
+                <ion-label>
+                    <h3>{{ product.name }}</h3>
+                    <p>{{ product.sku }}</p>
+                </ion-label>
+                <ion-badge color="warning">{{ product.stock }}</ion-badge>
+            </ion-item>
+            {% endfor %}
+        </ion-list>
+    </ion-card-content>
+</ion-card>
+{% endif %}
+{% endblock %}

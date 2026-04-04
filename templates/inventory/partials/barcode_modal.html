@@ -1,0 +1,67 @@
+<ion-modal id="barcode-modal-{{ product.id }}" trigger="barcode-btn-{{ product.id }}">
+    <ion-header>
+        <ion-toolbar>
+            <ion-title>{{ _("Barcodes") }} - {{ product.name }}</ion-title>
+            <ion-buttons slot="end">
+                <ion-button onclick="document.getElementById('barcode-modal-{{ product.id }}').dismiss()">
+                    {{ icon('close') }}
+                </ion-button>
+            </ion-buttons>
+        </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; gap: 2rem;">
+            <div style="text-align: center;">
+                <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">{{ product.name }}</p>
+            </div>
+
+            {# SKU Barcode (CODE128) #}
+            <div id="barcode-sku-container-{{ product.id }}" style="padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; max-width: 500px;">
+                <h3 style="text-align: center; margin-bottom: 1rem; color: var(--ion-color-medium); font-size: 0.9rem;">SKU - CODE128</h3>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div hx-get="/m/inventory/products/{{ product.id }}/barcode?type=sku"
+                         hx-trigger="load"
+                         hx-swap="innerHTML">
+                        <ion-spinner></ion-spinner>
+                    </div>
+                    <p style="margin-top: 0.5rem; font-family: monospace; font-size: 0.9rem; color: #333;">{{ product.sku }}</p>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
+                    <ion-button size="small" onclick="printBarcode('barcode-sku-container-{{ product.id }}')">
+                        {{ icon('print-outline') }}
+                        {{ _("Print") }}
+                    </ion-button>
+                    <ion-button size="small" fill="outline" onclick="downloadBarcode('barcode-sku-container-{{ product.id }}', 'sku-{{ product.sku }}')">
+                        {{ icon('download-outline') }}
+                        {{ _("Download") }}
+                    </ion-button>
+                </div>
+            </div>
+
+            {% if product.ean13 %}
+            {# EAN-13 Barcode #}
+            <div id="barcode-ean-container-{{ product.id }}" style="padding: 1.5rem; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; max-width: 500px;">
+                <h3 style="text-align: center; margin-bottom: 1rem; color: var(--ion-color-medium); font-size: 0.9rem;">EAN-13</h3>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div hx-get="/m/inventory/products/{{ product.id }}/barcode?type=ean13"
+                         hx-trigger="load"
+                         hx-swap="innerHTML">
+                        <ion-spinner></ion-spinner>
+                    </div>
+                    <p style="margin-top: 0.5rem; font-family: monospace; font-size: 0.9rem; color: #333;">{{ product.ean13 }}</p>
+                </div>
+                <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;">
+                    <ion-button size="small" onclick="printBarcode('barcode-ean-container-{{ product.id }}')">
+                        {{ icon('print-outline') }}
+                        {{ _("Print") }}
+                    </ion-button>
+                    <ion-button size="small" fill="outline" onclick="downloadBarcode('barcode-ean-container-{{ product.id }}', 'ean13-{{ product.ean13 }}')">
+                        {{ icon('download-outline') }}
+                        {{ _("Download") }}
+                    </ion-button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </ion-content>
+</ion-modal>

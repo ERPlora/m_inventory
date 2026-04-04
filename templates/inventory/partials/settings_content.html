@@ -1,0 +1,88 @@
+{% extends "ui/module_content.html" %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="settings-header mb-lg">
+        <h2 class="fs-xl fw-semibold">{{ _("Inventory Settings") }}</h2>
+        <p class="text-secondary">{{ _("Configure inventory module behavior") }}</p>
+    </div>
+
+    {# Stock Management #}
+    <div class="setting-section mb-lg">
+        <h3 class="fs-lg fw-semibold mb-md">{{ _("Stock Management") }}</h3>
+
+        <div class="setting-item d-flex justify-between align-center p-md rounded-lg mb-sm" style="background: var(--bg-color-secondary);">
+            <div>
+                <div class="fw-medium">{{ _("Allow Negative Stock") }}</div>
+                <div class="fs-sm text-secondary">{{ _("Allow products to have negative stock values") }}</div>
+            </div>
+            <ion-toggle
+                name="allow_negative_stock"
+                color="warning"
+                {% if config.allow_negative_stock %}checked{% endif %}
+                hx-post="/m/inventory/settings/toggle/"
+                hx-vals='{"name": "allow_negative_stock", "value": "{{ "false" if config.allow_negative_stock else "true" }}"}'
+                hx-swap="none">
+            </ion-toggle>
+        </div>
+
+        <div class="setting-item d-flex justify-between align-center p-md rounded-lg mb-sm" style="background: var(--bg-color-secondary);">
+            <div>
+                <div class="fw-medium">{{ _("Low Stock Alerts") }}</div>
+                <div class="fs-sm text-secondary">{{ _("Send alerts when products reach low stock threshold") }}</div>
+            </div>
+            <ion-toggle
+                name="low_stock_alert_enabled"
+                {% if config.low_stock_alert_enabled %}checked{% endif %}
+                hx-post="/m/inventory/settings/toggle/"
+                hx-vals='{"name": "low_stock_alert_enabled", "value": "{{ "false" if config.low_stock_alert_enabled else "true" }}"}'
+                hx-swap="none">
+            </ion-toggle>
+        </div>
+    </div>
+
+    {# Product Display #}
+    <div class="setting-section mb-lg">
+        <h3 class="fs-lg fw-semibold mb-md">{{ _("Product Display") }}</h3>
+
+        <div class="setting-item d-flex justify-between align-center p-md rounded-lg mb-sm" style="background: var(--bg-color-secondary);">
+            <div>
+                <div class="fw-medium">{{ _("Barcode Generation") }}</div>
+                <div class="fs-sm text-secondary">{{ _("Enable barcode generation and display for products") }}</div>
+            </div>
+            <ion-toggle
+                name="barcode_enabled"
+                {% if config.barcode_enabled %}checked{% endif %}
+                hx-post="/m/inventory/settings/toggle/"
+                hx-vals='{"name": "barcode_enabled", "value": "{{ "false" if config.barcode_enabled else "true" }}"}'
+                hx-swap="none">
+            </ion-toggle>
+        </div>
+    </div>
+
+    {# Reset #}
+    <div class="setting-actions mt-lg pt-md">
+        <ion-button
+            color="medium"
+            fill="outline"
+            expand="block"
+            hx-post="/m/inventory/settings/reset/"
+            hx-confirm="{{ _('Reset all settings to defaults?') }}"
+            hx-target="#main-content-area"
+            hx-include="[name='csrfmiddlewaretoken']">
+            {{ icon('refresh-outline') }}
+            {{ _("Reset to Defaults") }}
+        </ion-button>
+    </div>
+
+    {# Info #}
+    <div class="setting-info mt-lg p-md rounded-lg">
+        <div class="d-flex align-start gap-sm">
+            {{ icon('information-circle-outline', class='setting-info__icon') }}
+            <p class="fs-sm text-secondary m-0">
+                {{ _("This configuration is saved locally in the Hub and affects the inventory module behavior. Changes are applied immediately.") }}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

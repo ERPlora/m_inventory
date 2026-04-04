@@ -1,0 +1,242 @@
+{% extends "ui/app_base.html" %}
+
+{% block page_title %}
+    {% if mode == 'create' %}{{ _("Create Category") }}
+    {% elif mode == 'edit' %}{{ _("Edit Category") }}
+    {% else %}{{ _("View Category") }}{% endif %}
+{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1 class="page-title">
+        {% if mode == 'create' %}{{ _("Create Category") }}
+        {% elif mode == 'edit' %}{{ _("Edit Category") }}
+        {% else %}{{ _("View Category") }}{% endif %}
+    </h1>
+</div>
+
+<div class="ion-padding">
+    <ion-card>
+        <ion-card-content>
+
+            <form id="categoryForm" method="post" enctype="multipart/form-data">
+                {{ csrf_input() }}
+
+                {# Error Message #}
+                {% if error_message %}
+                <div class="p-md mb-md rounded-lg" style="background: rgba(var(--color-danger-rgb), 0.1); border-left: 4px solid var(--color-danger);">
+                    <div class="d-flex align-center gap-sm">
+                        {{ icon('alert-circle-outline', size=24, class='text-error') }}
+                        <span class="text-danger">{{ error_message }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                {# Category Image #}
+                <div class="mb-md">
+                    <label class="fs-sm fw-medium text-secondary d-block mb-xs">{{ _("Category Image") }}</label>
+                    <div id="dropzoneContainer">
+                        <label for="categoryImage" id="dropzoneLabel" class="d-flex flex-column align-center justify-center w-full rounded-lg cursor-pointer p-lg" style="height: 160px; background: var(--bg-color-secondary); border: 2px dashed var(--border-color);">
+                            {{ icon('cloud-upload-outline', size=32, class='text-base-content/40') }}
+                            <p class="mt-sm fs-sm"><span class="fw-semibold">{{ _("Click to upload") }}</span> {{ _("or drag and drop") }}</p>
+                            <p class="fs-xs text-secondary">{{ _("PNG, JPG or GIF (MAX. 800x400px)") }}</p>
+                            <input id="categoryImage" name="image" type="file" style="display: none;" accept="image/*" />
+                        </label>
+                    </div>
+                    <div id="categoryImagePreview" class="mt-sm text-center" style="display: none;">
+                        <img id="categoryImagePreviewImg" src="" alt="Preview" class="rounded-lg" style="max-width: 100%; max-height: 300px; box-shadow: var(--shadow-md);">
+                        <button type="button" id="removeImageBtn" class="mt-sm p-sm rounded" style="background: var(--color-danger); color: white; border: none; cursor: pointer;">
+                            {{ _("Remove Image") }}
+                        </button>
+                    </div>
+                </div>
+
+                {# Name #}
+                <ion-item>
+                    <ion-input
+                        label="{{ _('Name') }} *"
+                        label-placement="floating"
+                        name="name"
+                        value="{% if category %}{{ category.name }}{% endif %}"
+                        placeholder="{{ _('Enter category name') }}"
+                        required
+                        {% if readonly %}disabled{% endif %}>
+                    </ion-input>
+                </ion-item>
+
+                {# Description #}
+                <ion-item class="mt-sm">
+                    <ion-textarea
+                        label="{{ _('Description') }}"
+                        label-placement="floating"
+                        name="description"
+                        rows="3"
+                        value="{% if category %}{{ category.description }}{% endif %}"
+                        placeholder="{{ _('Category description') }}"
+                        {% if readonly %}disabled{% endif %}></ion-textarea>
+                </ion-item>
+
+                {# Icon & Color #}
+                <div class="ui-grid ui-grid--2 mt-sm">
+                    <ion-item>
+                        <ion-input
+                            label="{{ _('Icon') }}"
+                            label-placement="floating"
+                            name="icon"
+                            value="{% if category %}{{ category.icon }}{% else %}cube-outline{% endif %}"
+                            placeholder="cube-outline"
+                            {% if readonly %}disabled{% endif %}>
+                        </ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-label position="stacked">{{ _("Color") }}</ion-label>
+                        <input
+                            type="color"
+                            name="color"
+                            value="{% if category %}{{ category.color }}{% else %}#3880ff{% endif %}"
+                            class="w-full rounded"
+                            style="height: 40px; border: none; cursor: pointer; margin-top: 8px;"
+                            {% if readonly %}disabled{% endif %}>
+                    </ion-item>
+                </div>
+
+                {# Tax Class & Order #}
+                <div class="ui-grid ui-grid--2 mt-sm">
+                    <ion-item>
+                        <ion-select
+                            name="tax_class_id"
+                            label="{{ _('Tax Class') }}"
+                            label-placement="floating"
+                            value="{% if category and category.tax_class_id %}{{ category.tax_class_id }}{% endif %}"
+                            placeholder="{{ _('Select tax class') }}"
+                            {% if readonly %}disabled{% endif %}>
+                            <ion-select-option value="">{{ _("No Tax Class") }}</ion-select-option>
+                            {% if tax_classes %}
+                            {% for tc in tax_classes %}
+                            <ion-select-option value="{{ tc.id }}">{{ tc.name }} ({{ tc.rate }}%)</ion-select-option>
+                            {% endfor %}
+                            {% endif %}
+                        </ion-select>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input
+                            label="{{ _('Display Order') }}"
+                            label-placement="floating"
+                            name="order"
+                            type="number"
+                            min="0"
+                            value="{% if category %}{{ category.order }}{% else %}0{% endif %}"
+                            placeholder="0"
+                            {% if readonly %}disabled{% endif %}>
+                        </ion-input>
+                    </ion-item>
+                </div>
+
+                {# Action Buttons #}
+                {% if mode != 'view' %}
+                <div class="mt-lg">
+                    <ion-button type="submit" expand="block">
+                        {{ icon('save-outline') }}
+                        {% if mode == 'create' %}{{ _("Create Category") }}
+                        {% else %}{{ _("Save Changes") }}{% endif %}
+                    </ion-button>
+                </div>
+                {% endif %}
+            </form>
+        </ion-card-content>
+    </ion-card>
+</div>
+
+<script nonce="{{ csp_nonce }}">
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('categoryImage');
+    const previewDiv = document.getElementById('categoryImagePreview');
+    const previewImg = document.getElementById('categoryImagePreviewImg');
+    const dropzoneLabel = document.getElementById('dropzoneLabel');
+    const removeBtn = document.getElementById('removeImageBtn');
+
+    {% if category and category.image and mode != 'create' %}
+    if (previewDiv && previewImg) {
+        previewImg.src = '{{ category.image }}';
+        previewDiv.style.display = 'block';
+        dropzoneLabel.style.display = 'none';
+    }
+    {% endif %}
+
+    if (fileInput && previewDiv && previewImg) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewImg.src = event.target.result;
+                    previewDiv.style.display = 'block';
+                    dropzoneLabel.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    if (removeBtn) {
+        removeBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            previewDiv.style.display = 'none';
+            dropzoneLabel.style.display = 'flex';
+            previewImg.src = '';
+        });
+    }
+});
+
+// Form submission with async handling
+document.getElementById('categoryForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken') || '',
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            const toast = document.createElement('ion-toast');
+            toast.message = data.message;
+            toast.duration = 2000;
+            toast.color = 'success';
+            toast.position = 'top';
+            document.body.appendChild(toast);
+            await toast.present();
+
+            setTimeout(() => {
+                window.location.href = '/m/inventory/categories';
+            }, 1000);
+        } else {
+            const toast = document.createElement('ion-toast');
+            toast.message = data.message || '{{ _("Error saving category") }}';
+            toast.duration = 3000;
+            toast.color = 'danger';
+            toast.position = 'top';
+            document.body.appendChild(toast);
+            await toast.present();
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        const toast = document.createElement('ion-toast');
+        toast.message = '{{ _("Error processing request") }}';
+        toast.duration = 3000;
+        toast.color = 'danger';
+        toast.position = 'top';
+        document.body.appendChild(toast);
+        await toast.present();
+    }
+});
+</script>
+
+{% endblock %}

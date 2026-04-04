@@ -1,0 +1,45 @@
+<tbody id="categories-tbody">
+    {% for category in categories %}
+    <tr>
+        <td class="mono text-secondary">{{ category.id }}</td>
+        <td>
+            {% if category.image %}
+            <img src="{{ category.get_image_url() }}" alt="{{ category.name }}" class="table-image">
+            {% else %}
+            <div class="table-image-placeholder" style="background: {{ category.color }}20; border-color: {{ category.color }};">
+                {{ icon(category.icon, class='text-' + category.color) }}
+            </div>
+            {% endif %}
+        </td>
+        <td class="fw-medium">{{ category.name }}</td>
+        <td class="text-secondary hide-mobile">{{ category.description|truncate(60)|default("—") }}</td>
+        <td class="cell-center">
+            <span class="table-stock-badge" style="background: rgba(var(--color-primary-rgb), 0.15); color: var(--color-primary);">
+                {{ category.product_count }}
+            </span>
+        </td>
+        <td class="cell-center">{{ category.order }}</td>
+        <td>
+            <div class="table-actions">
+                <ion-button size="small" fill="clear" href="/m/inventory/categories/edit/{{ category.id }}" title="{{ _('Edit') }}">
+                    {{ icon('create-outline') }}
+                </ion-button>
+                <ion-button size="small" fill="clear" color="danger"
+                            onclick="confirmDeleteCategory('{{ category.id }}', '{{ category.name }}', this)"
+                            title="{{ _('Delete') }}">
+                    {{ icon('trash-outline') }}
+                </ion-button>
+            </div>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="7">
+            <div class="table-empty">
+                {{ icon('folder-open-outline', class='table-empty-icon') }}
+                <p>{{ _("No categories found") }}</p>
+            </div>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>

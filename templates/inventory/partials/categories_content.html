@@ -1,0 +1,105 @@
+{% extends "ui/module_content.html" %}
+
+{% block header_actions %}
+<ion-button size="default" fill="outline" onclick="document.getElementById('importCategoryFileInput').click()" title="{{ _('Import CSV/Excel') }}">
+    {{ icon('cloud-upload-outline') }}
+</ion-button>
+<input type="file" id="importCategoryFileInput" accept=".csv,.xlsx,.xls" style="display: none;" onchange="handleCategoryFileImport(this)">
+
+<ion-button size="default" fill="outline" href="{{ url_for('inventory.export_categories_csv') }}" title="{{ _('Export to CSV') }}">
+    {{ icon('download-outline') }}
+</ion-button>
+
+<ion-button size="default" href="{{ url_for('inventory.category_create_form') }}" title="{{ _('New Category') }}">
+    {{ icon('add-outline') }}
+</ion-button>
+{% endblock %}
+
+{% block content %}
+{# Search Bar #}
+<div class="filter-bar mb-md">
+    <ion-searchbar
+        type="text"
+        name="search"
+        value="{{ search }}"
+        placeholder="{{ _('Search categories...') }}"
+        hx-get="{{ url_for('inventory.categories_index') }}"
+        hx-target="#categories-table-container"
+        hx-trigger="input changed delay:300ms, search"
+        hx-include="[name='page'],[name='order_by'],[name='per_page']"
+    ></ion-searchbar>
+</div>
+
+{# Categories Table #}
+<ion-card class="m-0">
+    <ion-card-content class="p-0">
+        <div id="categories-table-container">
+            {% include "inventory/partials/categories_table_partial.html" %}
+        </div>
+    </ion-card-content>
+</ion-card>
+
+<script nonce="{{ csp_nonce }}">
+async function confirmDeleteCategory(categoryId, categoryName, buttonElement) {
+    Alpine.store('ui').confirmDelete(
+        `/m/inventory/categories/delete/${categoryId}/`,
+        categoryName,
+        'POST',
+        buttonElement
+    );
+}
+
+async function handleCategoryFileImport(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const fileName = file.name.toLowerCase();
+    let importUrl;
+    if (fileName.endsWith('.csv')) {
+        importUrl = '/m/inventory/categories/import/csv/';
+    } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        importUrl = '/m/inventory/categories/import/excel/';
+    } else {
+        Alpine.store('ui').error('{{ _("Invalid file format. Use CSV or Excel") }}');
+        input.value = '';
+        return;
+    }
+
+    const loadingToast = document.createElement('ion-toast');
+    loadingToast.message = '{{ _("Importing categories...") }}';
+    loadingToast.duration = 0;
+    loadingToast.position = 'top';
+    document.body.appendChild(loadingToast);
+    await loadingToast.present();
+
+    try {
+        const response = await fetch(importUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': Alpine.store('ui').getCsrfToken(),
+            }
+        });
+
+        const result = await response.json();
+        await loadingToast.dismiss();
+
+        if (response.ok) {
+            Alpine.store('ui').success(result.message || '{{ _("Categories imported successfully") }}');
+            window.location.reload();
+        } else {
+            Alpine.store('ui').error(result.error || '{{ _("Error importing categories") }}');
+        }
+    } catch (error) {
+        await loadingToast.dismiss();
+        console.error('Import error:', error);
+        Alpine.store('ui').error('{{ _("Error importing categories") }}');
+    }
+
+    input.value = '';
+}
+</script>
+{% endblock %}
