@@ -4,19 +4,15 @@ Inventory module manifest.
 Product and stock management with categories, variants, barcodes, import/export.
 """
 
-from app.core.i18n import LazyString
 
 # ---------------------------------------------------------------------------
 # Module identity
 # ---------------------------------------------------------------------------
 MODULE_ID = "inventory"
-MODULE_NAME = LazyString("Inventory", module_id="inventory")
+MODULE_NAME = "Inventory"
 MODULE_VERSION = "1.0.0"
 MODULE_ICON = "cube-outline"
-MODULE_DESCRIPTION = LazyString(
-    "Product and stock management with categories, variants, barcodes, import/export",
-    module_id="inventory",
-)
+MODULE_DESCRIPTION = "Product and stock management with categories, variants, barcodes, import/export"
 MODULE_AUTHOR = "ERPlora"
 MODULE_CATEGORY = "inventory"
 
@@ -44,7 +40,7 @@ MODULE_INDUSTRIES = [
 # Menu (sidebar entry)
 # ---------------------------------------------------------------------------
 MENU = {
-    "label": LazyString("Inventory", module_id="inventory"),
+    "label": "Inventory",
     "icon": "cube-outline",
     "order": 10,
 }
@@ -55,31 +51,31 @@ MENU = {
 NAVIGATION = [
     {
         "id": "dashboard",
-        "label": LazyString("Overview", module_id="inventory"),
+        "label": "Overview",
         "icon": "grid-outline",
         "view": "",
     },
     {
         "id": "products",
-        "label": LazyString("Products", module_id="inventory"),
+        "label": "Products",
         "icon": "cube-outline",
         "view": "products",
     },
     {
         "id": "categories",
-        "label": LazyString("Categories", module_id="inventory"),
+        "label": "Categories",
         "icon": "albums-outline",
         "view": "categories",
     },
     {
         "id": "reports",
-        "label": LazyString("Reports", module_id="inventory"),
+        "label": "Reports",
         "icon": "stats-chart-outline",
         "view": "reports",
     },
     {
         "id": "settings",
-        "label": LazyString("Settings", module_id="inventory"),
+        "label": "Settings",
         "icon": "settings-outline",
         "view": "settings",
     },
@@ -103,17 +99,17 @@ SETTINGS = {
 # Permissions
 # ---------------------------------------------------------------------------
 PERMISSIONS = [
-    ("view_product", LazyString("View products", module_id="inventory")),
-    ("add_product", LazyString("Add products", module_id="inventory")),
-    ("change_product", LazyString("Edit products", module_id="inventory")),
-    ("delete_product", LazyString("Delete products", module_id="inventory")),
-    ("view_category", LazyString("View categories", module_id="inventory")),
-    ("add_category", LazyString("Add categories", module_id="inventory")),
-    ("change_category", LazyString("Edit categories", module_id="inventory")),
-    ("delete_category", LazyString("Delete categories", module_id="inventory")),
-    ("export_product", LazyString("Export products", module_id="inventory")),
-    ("import_product", LazyString("Import products", module_id="inventory")),
-    ("manage_settings", LazyString("Manage settings", module_id="inventory")),
+    ("view_product", "View products"),
+    ("add_product", "Add products"),
+    ("change_product", "Edit products"),
+    ("delete_product", "Delete products"),
+    ("view_category", "View categories"),
+    ("add_category", "Add categories"),
+    ("change_category", "Edit categories"),
+    ("delete_category", "Delete categories"),
+    ("export_product", "Export products"),
+    ("import_product", "Import products"),
+    ("manage_settings", "Manage settings"),
 ]
 
 ROLE_PERMISSIONS = {
