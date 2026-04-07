@@ -80,7 +80,7 @@ async function handleCategoryFileImport(input) {
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': Alpine.store('ui').getCsrfToken(),
+                'X-CSRFToken': getCsrfToken(),
             }
         });
 

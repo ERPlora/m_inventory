@@ -199,7 +199,7 @@ document.getElementById('categoryForm').addEventListener('submit', async functio
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRFToken': formData.get('csrfmiddlewaretoken') || '',
+                'X-CSRFToken': getCsrfToken(),
             }
         });
 
