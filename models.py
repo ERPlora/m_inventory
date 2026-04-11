@@ -92,7 +92,7 @@ class Category(HubBaseModel):
     description: Mapped[str] = mapped_column(Text, default="", server_default="")
     order: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     tax_class_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("configuration_taxclass.id", ondelete="SET NULL"), nullable=True,
+        Uuid, ForeignKey("tax_class.id", ondelete="SET NULL"), nullable=True,
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
 
@@ -152,7 +152,7 @@ class Product(HubBaseModel):
     stock: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     low_stock_threshold: Mapped[int] = mapped_column(Integer, default=10, server_default="10")
     tax_class_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("configuration_taxclass.id", ondelete="SET NULL"), nullable=True,
+        Uuid, ForeignKey("tax_class.id", ondelete="SET NULL"), nullable=True,
     )
     image: Mapped[str] = mapped_column(String(500), default="", server_default="")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
