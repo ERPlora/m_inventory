@@ -269,9 +269,17 @@ class BulkCreateProducts(AssistantTool):
         errors = []
 
         async with atomic(db) as session:
+            # Count existing products to avoid SKU collisions when auto-generating
+            from sqlalchemy import func, select as sa_select
+            from inventory.models import Product as _Product
+            existing_count_result = await session.execute(
+                sa_select(func.count()).select_from(_Product).where(_Product.hub_id == hub_id)
+            )
+            existing_count = existing_count_result.scalar_one()
+
             for i, item in enumerate(items):
                 try:
-                    sku = item.get("sku") or f"PROD-{(i + 1):03d}"
+                    sku = item.get("sku") or f"PROD-{(existing_count + i + 1):03d}"
                     tax_class_id = await _resolve_tax_class(
                         item.get("tax_class_id"), session, hub_id
                     )
