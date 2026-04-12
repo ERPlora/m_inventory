@@ -47,7 +47,7 @@ async def _get_config(db, hub_id) -> InventoryConfig:
 # ============================================================================
 
 @router.get("/")
-@htmx_view(module_id="inventory", view_id="dashboard")
+@htmx_view(module_id="inventory", view_id="dashboard", partial_template="inventory/partials/dashboard_content.html")
 async def dashboard(request: Request, db: DbSession, user: CurrentUser, hub_id: HubId):
     """Dashboard with stats and summary."""
     q = _q(Product, db, hub_id)
@@ -90,7 +90,7 @@ async def dashboard(request: Request, db: DbSession, user: CurrentUser, hub_id: 
 # ============================================================================
 
 @router.get("/products")
-@htmx_view(module_id="inventory", view_id="products")
+@htmx_view(module_id="inventory", view_id="products", permissions="inventory.view_product")
 async def products_list(
     request: Request, db: DbSession, user: CurrentUser, hub_id: HubId,
     search: str = "", order_by: str = "-id", page: int = 1, per_page: int = 25,
@@ -205,7 +205,7 @@ async def product_list_ajax(
 # ============================================================================
 
 @router.get("/products/create")
-@htmx_view(module_id="inventory", view_id="product_create")
+@htmx_view(module_id="inventory", view_id="product_create", permissions="inventory.add_product")
 async def product_create_form(request: Request, db: DbSession, user: CurrentUser, hub_id: HubId):
     """Show product create form."""
     categories = await _q(Category, db, hub_id).filter(
@@ -289,7 +289,7 @@ async def product_create_post(request: Request, db: DbSession, user: CurrentUser
 # ============================================================================
 
 @router.get("/products/{pk}")
-@htmx_view(module_id="inventory", view_id="product_view")
+@htmx_view(module_id="inventory", view_id="product_view", permissions="inventory.view_product")
 async def product_view(
     request: Request, pk: uuid.UUID, db: DbSession, user: CurrentUser, hub_id: HubId,
 ):
@@ -317,7 +317,7 @@ async def product_view(
 # ============================================================================
 
 @router.get("/products/{pk}/edit")
-@htmx_view(module_id="inventory", view_id="product_edit")
+@htmx_view(module_id="inventory", view_id="product_edit", permissions="inventory.change_product")
 async def product_edit_form(
     request: Request, pk: uuid.UUID, db: DbSession, user: CurrentUser, hub_id: HubId,
 ):
@@ -705,7 +705,7 @@ async def import_excel(request: Request, db: DbSession, user: CurrentUser, hub_i
 # ============================================================================
 
 @router.get("/categories")
-@htmx_view(module_id="inventory", view_id="categories")
+@htmx_view(module_id="inventory", view_id="categories", permissions="inventory.view_category")
 async def categories_index(
     request: Request, db: DbSession, user: CurrentUser, hub_id: HubId,
     search: str = "", order_by: str = "order", page: int = 1, per_page: int = 25,
@@ -794,7 +794,7 @@ async def categories_list_api(
 
 
 @router.get("/categories/create")
-@htmx_view(module_id="inventory", view_id="category_create")
+@htmx_view(module_id="inventory", view_id="category_create", permissions="inventory.add_category")
 async def category_create_form(request: Request, db: DbSession, user: CurrentUser, hub_id: HubId):
     """Show category create form."""
     return {"mode": "create"}
@@ -825,7 +825,7 @@ async def category_create_post(request: Request, db: DbSession, user: CurrentUse
 
 
 @router.get("/categories/edit/{pk}")
-@htmx_view(module_id="inventory", view_id="category_edit")
+@htmx_view(module_id="inventory", view_id="category_edit", permissions="inventory.change_category")
 async def category_edit_form(
     request: Request, pk: uuid.UUID, db: DbSession, user: CurrentUser, hub_id: HubId,
 ):
@@ -1168,7 +1168,7 @@ async def reports_view(request: Request, db: DbSession, user: CurrentUser, hub_i
 # ============================================================================
 
 @router.get("/settings")
-@htmx_view(module_id="inventory", view_id="settings")
+@htmx_view(module_id="inventory", view_id="settings", permissions="inventory.manage_settings")
 async def settings_view(request: Request, db: DbSession, user: CurrentUser, hub_id: HubId):
     """Settings page."""
     config = await _get_config(db, hub_id)
