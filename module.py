@@ -10,7 +10,7 @@ Product and stock management with categories, variants, barcodes, import/export.
 # ---------------------------------------------------------------------------
 MODULE_ID = "inventory"
 MODULE_NAME = "Inventory"
-MODULE_VERSION = "1.0.9"
+MODULE_VERSION = "1.0.10"
 MODULE_ICON = "cube-outline"
 MODULE_DESCRIPTION = "Product and stock management with categories, variants, barcodes, import/export"
 MODULE_AUTHOR = "ERPlora"

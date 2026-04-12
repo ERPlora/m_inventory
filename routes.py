@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse, Response, StreamingResponse
 from sqlalchemy import func, or_
 from sqlalchemy.orm import selectinload
 
+from app.config.settings import get_settings
 from app.core.db.query import HubQuery
 from app.core.db.transactions import atomic
 from app.core.dependencies import CurrentUser, DbSession, HubId
@@ -72,7 +73,7 @@ async def dashboard(request: Request, db: DbSession, user: CurrentUser, hub_id: 
         Product.stock <= Product.low_stock_threshold
     ).order_by(Product.stock).limit(10).all()
 
-    currency = "EUR"
+    currency = get_settings().CURRENCY
 
     return {
         "total_products": total_products,
